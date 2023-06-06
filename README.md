@@ -1,2 +1,2 @@
 # ProgrammingPackage_public
-public version of programming package
+This webpage describes the replication file for the minimum working example base on the paper Macroeconomic Drivers of Bond and Equity Risks (JPE, 2020). Specifically, with these codes, we want to replicate some results from the first calibration of the model presented in Tables 2, 3, and 4 of the paper. And also get some key variables that we can use to get some stock and bond moments.
