@@ -9,7 +9,7 @@ macro1=macro_dyn;
 num1=num_set; 
 asset=asset_p;
 %% Input Parameters for the class macro1, asset and num1
-% Define a dummy variable to run the risk neutral part (=1 to risk neutral)
+% Define a dummy variable to run the risk neutral part (=1 for risk neutral)
 asset.risk_neutral_run = 1;
 % macro1 class parameters
 macro1.theta0 = 0.9658; 
