@@ -2,6 +2,12 @@
 % Autors: John Y. Campbell, Carolin Pflueger, and Luis M. Viceira
 % Title: Macroeconomic Drivers of Bond and Equity Risks (JPE, 2020)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% If you have any questions or comments regarding this package, we encourage 
+% you to reach us by leaving a comment in the "Issues" section of the 
+% corresponding GitHub repository (https://github.com/cpflueger/ProgrammingPackage_public).
+% Alternatively, you can also contact us directly via the following email addresses:
+% cpflueger@uchicago.edu - l.yepezsa95@gmail.com
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 clear variables
 close all
 %% Define the class macro1, num1 and asset
