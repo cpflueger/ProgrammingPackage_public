@@ -1,2 +1,2 @@
 # ProgrammingPackage_public
-This webpage describes the replication file for the minimum working example base on the paper Macroeconomic Drivers of Bond and Equity Risks (JPE, 2020). Specifically, with these codes, we want to replicate some results from the first calibration of the model presented in Tables 2, 3, and 4 of the paper. And also get some key variables that we can use to get some stock and bond moments.
+This webpage contains the replication file for the paper "Macroeconomic Drivers of Bond and Equity Risks" by John Campbell, Carolin Pflueger, and Luis Viceira (JPE, 2020). The main file is minimum_working_example.m. Detailed instructions and example are described in Manual_CPV2020.pdf. 
