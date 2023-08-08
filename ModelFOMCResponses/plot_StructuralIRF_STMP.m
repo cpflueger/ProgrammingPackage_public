@@ -1,8 +1,10 @@
 %Plot: 2x3 panel of impulse responses to Short-Term MP shock.
 % Subplot 1: MP Rate
 % Subplot 2: Output Gap
-% Subplot 3: Equity Return (PD)
-% Subplot 4: (Nominal) Bond Yield
+% Subplot 3: Inflation
+% Subplot 4: Equity Return (PD)
+% Subplot 5: (Nominal) Bond Yield
+% Subplot 6: (Real) Bond Yield
 
 function plot_StructuralIRF_STMP(asset_p, figNameFile, figNameHeader)
         rng(0);
@@ -11,8 +13,7 @@ function plot_StructuralIRF_STMP(asset_p, figNameFile, figNameHeader)
         % Plot figure
         h = figure;
         pause(0.00001);
-%         frame_h = get(handle(gcf),'JavaFrame');
-%         set(frame_h,'Maximized',1);
+
         set(gcf,'WindowState','Maximized');
         set(gcf,'color','w');
         x_axis = [0:16];
@@ -31,7 +32,7 @@ function plot_StructuralIRF_STMP(asset_p, figNameFile, figNameHeader)
         set(p,'Color', [0,0,0]);
         hold on;
         xlim([0,numel(x_axis)-1]);
-        plot(0*asset.Irf3.x,'-k');
+        plot(x_axis,0*asset.Irf3.x(1:numel(x_axis)),'-k');
         set(gca, 'FontSize', 20);
         ylabel('Output Gap','fontweight','normal','fontsize',20);
         
@@ -40,7 +41,7 @@ function plot_StructuralIRF_STMP(asset_p, figNameFile, figNameHeader)
         set(p,'Color', [0,0,0]);
         hold on;
         xlim([0,numel(x_axis)-1]);
-        plot(0*asset.Irf3.pi,'-k');
+        plot(x_axis,0*asset.Irf3.pi(1:numel(x_axis)),'-k');
         set(gca, 'FontSize', 20);
         ylabel('Inflation','fontweight','normal','fontsize',20);
 
@@ -77,8 +78,6 @@ function plot_StructuralIRF_STMP(asset_p, figNameFile, figNameHeader)
         xlim([0,numel(x_axis)-1]);
         ylim([-0.06,0.21]);
         ylabel('Nominal Bond Yield','fontweight','normal','fontsize',20);
-        %legend({'Overall','Risk Neutral', 'Risk Premium'}, 'Location', 'northeast');
-        %legend('boxoff');
         
         subplot(2,3,6);
         p = plot(x_axis,asset.Irf3.y10real(1:numel(x_axis)), 'linewidth',2);
@@ -99,10 +98,8 @@ function plot_StructuralIRF_STMP(asset_p, figNameFile, figNameHeader)
         legend({'Overall','Risk Neutral', 'Risk Premium'}, 'Location', 'northeast');
         legend('boxoff');
         
-
         pause(.3);
         
-%        export_fig([char(figNameFile), 'structuralIRF_STMP'],'-pdf','-nocrop');
         saveas(gcf,'IRF_STMP','png')
         
 end

@@ -4,14 +4,12 @@ classdef macro_dyn
       phi,                       % smoothing parameter for consumption 
       g,                         % consumption growth rate
       delta,                     % leverage parameter relating the dividend growth to consumption growth 
-      delta_betaport,            %XXXFL: leverage of beta-sorted portfolios
+      delta_betaport,            % leverage of beta-sorted portfolios
       theta0,                    % persistence of the surplus consumption ratio
       theta1,                    % dependence of the surplus consumption ratio on current output gap
       theta2,                    % dependence of the surplus consumption ratio on lagged output gap
       gamma,                     % parameter controlling utility curvature
       rf,                        % steady state real short-term interest rate at x_t = 0 
-      theta,                     % substitutability across varietal goods
-      omega,                     % elasticity of marginal costs to own production
       sigma_vec,                 % variances of fundamental shocks, in particular, those are the calibrated
                                  % values for the variances of respectively, u^IS (set to 0), u^PC, u^MP and u^*
                                  % to get empirically relevant values in Table 4 of the paper, for example sigma^PC = 400*sqrt(sigma_vec(2))
@@ -30,13 +28,10 @@ classdef macro_dyn
       P,                         % P, Q are the matrices determining the solution for the dynamics of 
                                  % Y_t, in the form Y_t = P*Y_t-1 + Q*u_t
       Q,                         %
-      impact_negative,           % 1 if one of the diagonal entries of the solution Q is
-                                 % negative, 0 otherwise
       number_stable,             % number of stable eigenvalues (modulus < 1)
       number_complex,            % number of complex eigenvalues
       eigenvalues,               % eigenvalues used to construct solution                
       eigenvalues_select,        % the three eigenvalues we actually select
-      explosive_prop,            % Proportion of simulations that result in explosive macro dynamics
       A,                         % Matrix rotating \hat Y_t so that shocks to Z tilde = A* \hat Y_t 
                                  % are independent standard normal and the first element is conditionally
                                  % perfectly correlated with consumption (Appendix A.2.3)
@@ -56,33 +51,6 @@ classdef macro_dyn
       Smax,                      % exp(smax)
       Sigmau,                    % variance covariance matrix of the fundamental shocks
       QM,                        % defined in equation (6) of the appendix
-      empT,                      % sample size for this period
-      data_5y_ffx_correlation,   % data correlation between 20-quarter average Fed Funds rate and output gap
-      data_5y_infl_correlation,  % data correlation between 20-quarter average inflation rate and output gap
-      data_ffx_correlation,      % data correlation between Fed Funds rate and output gap
-      data_infl_correlation,     % data correlation between inflation and output gap
-      model_irf,                 % model simulated IRF for orthogonalized shocks
-      data_irf,                  % empirical IRF for orthogonalized shocks 
-      data_variances,            % corresponding  bootstrapped variances for empirical IRF points
-      data_lower_irf,            % lower border of 95% bootrstrapped confidence band for empirical IRF
-      data_upper_irf,            % upper border of 95% bootrstrapped confidence band for empirical IRF
-      J,                         % discrepancy between model and data IRFs similar to CEE (2005) but only for 1q,1y,3y,5y and 10y points
-      jMomentsCov,               % covariance of moments used to compute J value, obtained in bootstrap step of feed_data - corresponds to \hat V in appendix
-      model_5y_ffx_coeff,        % model beta of 20 quarters realized average fed funds rate on output gap
-      model_5y_ffx_correlation,  % model correlation of 20 quarters realized average fed funds rate on output gap
-      model_5y_infl_coeff,       % model beta of 20 quarters realized average inflation on output gap
-      model_5y_infl_correlation, % model correlation of 20 quarters realized average inflation on output gap
-      model_infl_coeff,          % model beta of quarterly inflation on output gap
-      model_infl_correlation,    % model correlation of quarterly inflation on output gap
-      model_ffx_coeff,           % model beta of quarterly Fed Funds rate on output gap
-      model_ffx_correlation,     % model correlation of quarterly Fed Funds rate on output gap
-      model_summary_stats,       % model macro summary stats
-      VECM,                      % use VECM IRFs if = 1
-      data_irf_VECM,             % Moments corresponding to above but for VECM estimation
-      data_variances_VECM,
-      data_lower_irf_VECM,
-      data_upper_irf_VECM,
-      jMomentsCov_VECM,
       solutionNumber,            % Identifies which solution has been selected by ModelPQ82
    end
    
@@ -104,9 +72,9 @@ classdef macro_dyn
            macro_dyn.delta_betaport = [1.4813;1.0255;1.0255;0.9132;0.8031;0.7017;0.6802;0.6410;0.5376;0.4796];
        end
       
-      %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+      %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
       %% ModelPQ82 Solves for the macro dynamics of the model using the method of generalized eigenvectors and selects an equilibrium 
-      %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+      %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
       function macro_dyn = ModelPQ82(macro_dyn, num_set)
             %% Set up matrices F,G,H,M, defining the equation to be solved 
             % 0 = F*E_t(Y_t+1) + G*Y_t + H*Y_t-1 + M*u_t
@@ -126,7 +94,7 @@ classdef macro_dyn
                 0, 1, 0, -macro_dyn.rho_pi;
                 0, 0, 1, -macro_dyn.rho_i];
         
-            %G-matrix used to solve for lead-lag coefficients
+            % G-matrix used to solve for lead-lag coefficients
             G_a=G;
         %% Solve for P and Q
             m=3; % Number of state variables. In our case we have three: 
@@ -157,7 +125,7 @@ classdef macro_dyn
             % Stable eigenvalues
             evec_stable = evec2(abs(evec2)<1);
             macro_dyn.number_stable  = size(evec_stable,1);
-            %Count how many stable and complex eigenvalues there are
+            % Count how many stable and complex eigenvalues there are
             evec_complex    = evec2(and(real(evec2)~=evec2,abs(evec2)<1));
             macro_dyn.number_complex = size(evec_complex,1); 
 
@@ -267,11 +235,11 @@ classdef macro_dyn
                 Ps(i,:,:)         = macro_dyn.P;
                 Qs(i,:,:)         = macro_dyn.Q;
 
-                %output gap shock loading onto u_t
+                % Output gap shock loading onto u_t
                 QMs(i,:) =[1,0,0]*macro_dyn.Q; 
             end  
         
-       %We used the first solution as the best, even though we have 2 or more solutions
+       % We used the first solution as the best, even though we have 2 or more solutions
        macro_dyn.eigenvalues_select = evec2(select_mat(1,:)); 
        macro_dyn.P          = reshape(Ps(1,:,:),3,3);
        macro_dyn.Q          = reshape(Qs(1,:,:),3,4);
@@ -322,13 +290,13 @@ classdef macro_dyn
             
             % First row of A is proportional to first row of Q
             A1 = [1,0,0]/macro_dyn.sigmac;
-            % pick A2 in the null space of A1*Q*Sigmau*Q'
+            % Pick A2 in the null space of A1*Q*Sigmau*Q'
             null1 = null(A1*macro_dyn.Q*macro_dyn.Sigmau*macro_dyn.Q');
             A2 = null1(:,1)';
-            % scale so that A2*u has unit variance
+            % Scale so that A2*u has unit variance
             A2 = A2/sqrt(A2*macro_dyn.Q*macro_dyn.Sigmau*macro_dyn.Q'*A2');
             
-            % pick A3 in null space of A1*Q*Sigmau*Q' and A2*Q*Sigmau*Q'
+            % Pick A3 in null space of A1*Q*Sigmau*Q' and A2*Q*Sigmau*Q'
             null2 = null([A1*macro_dyn.Q*macro_dyn.Sigmau*macro_dyn.Q'; A2*macro_dyn.Q*macro_dyn.Sigmau*macro_dyn.Q']);
             A3=null2';
             A3=A3/sqrt(A3*macro_dyn.Q*macro_dyn.Sigmau*macro_dyn.Q'*A3');
@@ -344,18 +312,18 @@ classdef macro_dyn
             % sigmaperp = standard deviation of orthogonal component of v_* 
             macro_dyn.sigmaperp = sqrt(macro_dyn.sigma_vec(4)-macro_dyn.vast'*macro_dyn.vast);
             
-            % dynamics for scaled state vector \tilde P
+            % Dynamics for scaled state vector \tilde P
             macro_dyn.Ptilde                 = macro_dyn.A*macro_dyn.P/macro_dyn.A;
             
-            % unconditional variance and standard deviation of \tilde Z
+            % Unconditional variance and standard deviation of \tilde Z
             % StdZtilde will be used determine the numerical grid for the value
             % function iteration
             macro_dyn.VarZtilde              = Uncon_var(macro_dyn.Ptilde, diag([1,1,1]));
             macro_dyn.StdZtilde              = sqrt(diag(macro_dyn.VarZtilde));
       end
-      %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+      %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
       %% ModelPQ82_dynare Solves for the macro dynamics of the model using Dynare
-      %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+      %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
       function macro_dyn = ModelPQ82_dynare(macro_dyn)
             % Solving the model in dynare
             dynare NK_dynare.mod

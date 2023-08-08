@@ -6,9 +6,6 @@
 
 classdef num_set
     properties
-        delta_step,     % step size in numerical derivative calculations 
-        it,             % number of steps for global convergence for E-stability
-        n,              % maturity of bond in quarters
         Nbonds,         % maximal bond maturity 
         NN,             % maturity of zero coupon bonds/dividend claims 
         Nbins,          % number of bins to make the plot of regression coefficients by bin (10 for deciles etc)
@@ -25,7 +22,6 @@ classdef num_set
         T,              % length of simulation
         Tirf,           % length of impulse response
         burn,           % length of burn-in period
-        simulate,       % simulated IRFs? takes value 0 or 1
         N1,             % number of gridpoints to list in Z
         N2,             % number of gridpoints to list in shat 
         N3,             % number of gridpoints to list in Ztilde 
@@ -47,8 +43,6 @@ classdef num_set
                         % i.e. for dimensions 2 and 3 of z tilde 
         shat,           % list of  scalar log deviations of surplus-consumption ratio from steady state
         lambdas,        % values of sensitivity function at each of the points listed in shat
-        maxT,           % IRF length
-        bootstrap_T     % Number of time series to generate for bootstrap
         h               % bond maturity in quarters on RHS of FOMC day yield regressions
     end
     
@@ -99,10 +93,10 @@ classdef num_set
             countpoints(2,1:num_set.N)    = (1:num_set.N);
             countpoints(3,1:num_set.N)    = (1:num_set.N);
 
-            % create grid with dimension length(StdZtilde) X N i.e. 3 X N
+            % Create grid with dimension length(StdZtilde) X N i.e. 3 X N
             zgrid = -repmat(num_set.m.*macro_dyn.StdZtilde, 1, num_set.N)+ 2*(countpoints-1).*repmat(num_set.m.*macro_dyn.StdZtilde./(num_set.N-1), 1, num_set.N); 
 
-            % create the matrix Z in which each row is a point in the 3 dimensional space of the
+            % Create the matrix Z in which each row is a point in the 3 dimensional space of the
             % Z tilde state variables: essentially listing gridpoints
             [z1, z2, z3] = ndgrid(zgrid(1,:), zgrid(2,:), zgrid(3,:)); 
             z1=reshape(z1,1,num_set.N^3); 
@@ -135,18 +129,20 @@ classdef num_set
             num_set.xGL                    = num_set.xGL*num_set.GLdomain;
             num_set.wGL                    = num_set.wGL*num_set.GLdomain;
 
-            [num_set.xGL2, num_set.wGL2]           = GaussLegendre(num_set.GLpoints2);
+            [num_set.xGL2, num_set.wGL2]   = GaussLegendre(num_set.GLpoints2);
             num_set.xGL2                   = num_set.xGL2*num_set.GLdomain2;
             num_set.wGL2                   = num_set.wGL2*num_set.GLdomain2;
 
-            [num_set.xGL3, num_set.wGL3]           = GaussLegendre(num_set.GLpoints3);
+            [num_set.xGL3, num_set.wGL3]   = GaussLegendre(num_set.GLpoints3);
             num_set.xGL3                   = num_set.xGL3*num_set.GLdomain3;
             num_set.wGL3                   = num_set.wGL3*num_set.GLdomain3;
 
-            % Number of grid points for z
+            % Number of grid points for Ztilde
             num_set.N1                     = num_set.N^3;
+            % Number of grid points for surplus consumption ratio
             num_set.N2                     = max(size(num_set.shat));
-            % Dimension of ztilde
+            % Number of grid points on subgrid for Ztilde covering only
+            % dimensions 2 and 3
             num_set.N3                     = max(size(num_set.Ztilde));
             
             return
@@ -192,23 +188,30 @@ classdef num_set
         % index4: e_2 z_{t+1}, e_3 z_{t+1} - we need this to interpolate over dimensions 2 and 3 at time t+1
         % index5: epsilon_{1,t+1}
         
-        %define constants to get how  E_t s_{t+1} loads onto state vector
+        % Define constants to get how  E_t s_{t+1} loads onto state vector
         phi    =   macro_dyn.phi;
         Ainv   =   macro_dyn.Ainv;
         P      =   macro_dyn.P;
         const2 =  [1,0,0]*( P- phi*eye(3))* Ainv;
         const3 = ([0,0,1]-[0,1,0]* P)* Ainv;
 
+        % Initialize splusgrid 
         InitialValue    = zeros(num_set.N1, num_set.N2, num_set.sizexm, num_set.N3, num_set.GLpoints);
         num_set.splusgrid       = InitialValue;
+
+        % Consumption shock at each of the Gauss-Legendre points for
+        % \eps_{1,t+1}
         epsc                    = macro_dyn.sigmac*num_set.xGL;
+
+        % Loop over grid for state vector and compute vector of possible
+        % values for s(t+1) for each Gauss-Legendre point of \eps_{1,t+1}
             for i1=1:num_set.N1
                 for i4=1:num_set.N3
                     for i5=1:num_set.GLpoints
                         for i2=1:num_set.N2
                             for i3=1:num_set.sizexm                              
-                                %alternative definition, that does not
-                                %explicitly rely on x_{t-1}
+                                % Alternative definition, that does not
+                                % explicitly rely on x_{t-1}
                                 sint  = macro_dyn.theta0*num_set.shat(i2)+((1/macro_dyn.gamma)*const3-const2)*num_set.Z(i1,:)'+num_set.lambdas(i2)*epsc(i5);
                                 num_set.splusgrid(i1,i2,i3,i4,i5) =  sint;
                             end
@@ -229,15 +232,15 @@ classdef num_set
                 case {1,2,3,4,5}
                     switch(num_set.sfast)
                         case 1,
-                            %Grid 1: Same as original CC grid with 13 points
+                            % Grid 1: Same as original CC grid with 13 points
                             splot  = log(macro_dyn.Smax/13:macro_dyn.Smax/13:macro_dyn.Smax);
                             num_set.shat           = real(splot-macro_dyn.sbar);
                         case 2,
-                            %Grid 2: Same as original CC grid with 50 points
+                            % Grid 2: Same as original CC grid with 50 points
                             splot  = log(macro_dyn.Smax/50:macro_dyn.Smax/50:macro_dyn.Smax);
                             num_set.shat           = real(splot-macro_dyn.sbar);
                         case 3,
-                            %Grid 2: Same as original CC grid with 100 points
+                            % Grid 2: Same as original CC grid with 100 points
                             splot  = log(macro_dyn.Smax/100:macro_dyn.Smax/100:macro_dyn.Smax);
                             num_set.shat   = real(splot-macro_dyn.sbar);
                         case 4,
@@ -249,25 +252,27 @@ classdef num_set
 
                 case {6,7,8}
                     switch(num_set.sfast)
-                        case 6, %This is the case we mostly use
-                            %Intermediate size grid of size 50
+                        case 6, % This is the case we mostly use
+                            % Intermediate size grid of size 50
                             splotu  = log(macro_dyn.Smax/20:macro_dyn.Smax/20:macro_dyn.Smax);
-                            %lower segment as in Wachter
+                            % Lower segment as in Wachter
                             splot1  = (-50:(50+splotu)/30:min(splotu)-(50+splotu)/130);
                             splot   = horzcat(splot1, splotu); %concatenate arrays horizontally
                         case 7,
                             splotu  = log(macro_dyn.Smax/20:macro_dyn.Smax/20:macro_dyn.Smax);
-                            %lower segment as in Wachter
+                            % Lower segment as in Wachter
                             splot1=(-100:(100+splotu)/100:min(splotu)-(100+splotu)/130);
                             splot  = horzcat(splot1, splotu);
                         case 8,
-                            %This is the largest grid, exactly as in Wachter
-                            %Upper segment as in Wachter. 
+                            % This is the largest grid, exactly as in Wachter
+                            % Upper segment as in Wachter. 
                             splotu  = log(macro_dyn.Smax/101:macro_dyn.Smax/101:macro_dyn.Smax);
-                            %lower segment as in Wachter
+                            % Lower segment as in Wachter
                             splot1=(-300:(300+splotu)/900:min(splotu)-(300+splotu)/900);
                             splot  = horzcat(splot1, splotu);
                     end
+
+            % Subtract sbar to obtain grid for surplus consumption ratio relative to steady-state  
             num_set.shat = real(splot-macro_dyn.sbar);
             end
         end
