@@ -60,15 +60,15 @@ classdef macro_dyn
       %% ModelPQ82 Solves for the macro dynamics of the model using the method of generalized eigenvectors and selects an equilibrium 
       %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
       function macro_dyn = ModelPQ82(macro_dyn, num_set)
-        %define parameters  
+        % Define parameters  
         theta1=macro_dyn.theta1;
         theta2=macro_dyn.theta2;
         phi=macro_dyn.phi;
         gamma=macro_dyn.gamma;
         Pinput=macro_dyn.P(2:3,:);
 
-        %Define matrix M that relates model shocks v_t to vector of
-        %orthogonal shocks u_t via v_t=M u_t
+        % Define matrix M that relates model shocks v_t to vector of
+        % orthogonal shocks u_t via v_t=M u_t
         m23 = macro_dyn.sigma_vNew(1)*macro_dyn.corr_vNew(3,1)/macro_dyn.sigma_vNew(3);
         m31 = macro_dyn.sigma_vNew(2)*(macro_dyn.corr_vNew(2,1) - macro_dyn.corr_vNew(3,1)*macro_dyn.corr_vNew(3,2))/(macro_dyn.sigma_vNew(1)*(1-macro_dyn.corr_vNew(3,1)^2));
         m33 = macro_dyn.sigma_vNew(2)*macro_dyn.corr_vNew(3,2)/macro_dyn.sigma_vNew(3);
@@ -77,9 +77,9 @@ classdef macro_dyn
                  m31, 1, m33; 
                  0,   0, 1];
         
-        %variance-covariance matrix of v_t
+        % variance-covariance matrix of v_t
         Sigma_vNew = corr2cov(macro_dyn.sigma_vNew, macro_dyn.corr_vNew);
-        %variance-covariance matrix of u_t
+        % variance-covariance matrix of u_t
         macro_dyn.sigma_vec = [10^-16,diag(inv(Mtemp)*Sigma_vNew *inv(Mtemp)')'];
 
        %% Define Blanchard-Kahn problem
@@ -95,7 +95,7 @@ classdef macro_dyn
 
         A=inv(Atilde)*Btilde;
 
-        %eigenvalue decomposition
+        % Eigenvalue decomposition
         [B,J]=eig(A);             
         
         % Sort eigenvalues
@@ -105,7 +105,7 @@ classdef macro_dyn
         macro_dyn.eigenvalues = evec2;
         B2     = B(:,IX);  
         
-        %Equilibrium selection        
+        % Equilibrium selection        
         % detect stable eigenvalues with modulus less than one
         evec_stable = evec2(abs(evec2)<1);
         macro_dyn.number_stable  = size(evec_stable,1);
@@ -118,9 +118,9 @@ classdef macro_dyn
         % 4 stable evalues (2 complex) > 2 possible solutions
         % 4 stable evalues (all real) > 4 possible solutions
         
-        %select_mat is such that each row corresponds to a selection of
-        %three eigenvalues, that lead to a real-valued non-explosive
-        %solution
+        % Select_mat is such that each row corresponds to a selection of
+        % three eigenvalues, that lead to a real-valued non-explosive
+        % solution
 
         switch macro_dyn.number_stable
             case 2
@@ -150,14 +150,14 @@ classdef macro_dyn
                 end
 
         end
-        %compute Ps, Qs, impulse responses and SMM objective function for all
-        %real-valued non-explosive equilibria
+        % Compute Ps, Qs, impulse responses and SMM objective function for all
+        % real-valued non-explosive equilibria
         Js         = zeros(size(select_mat,1),1);
         Ps         = zeros(size(select_mat,1),3,3);
         Qs         = zeros(size(select_mat,1),3,4);
         QMs        = zeros(size(select_mat,1),4);
         
-        %loop over different equilibria
+        % Loop over different equilibria
         for i = 1:size(select_mat,1)
             select = select_mat(i,:); 
             
@@ -165,15 +165,15 @@ classdef macro_dyn
         B11=B2(1:3,select);
         J1=diag(evec2(select));
             
-            %solution for P
+            % Solution for P
             macro_dyn.P = real(B11*J1*inv(B11)); % This is B^(BK) in the appendix
-            % check that B11 is not too close to be not invertible
+            % Check that B11 is not too close to be not invertible
             if min(abs(eig(B11))) < 1e-6
                 warning('Cant construct Q, skipping this combination of eigenvalues')
                 Js(i) = 10000;
                 continue;
             end    
-            %matrix Sigma from BK solution
+            % Matrix Sigma from BK solution
             Sigma=zeros(3,2);  % This is Sigma^(BK) in the appendix
             Sigma(2,1)=1;
             Sigma(3,2)=1;
@@ -186,8 +186,8 @@ classdef macro_dyn
                     
             Sigma(1,1)=(macro_dyn.P(1,2)+macro_dyn.P(2,2)/gamma)/(phi-theta1-macro_dyn.P(1,1)-macro_dyn.P(2,1)/gamma);
             Sigma(1,2)=(macro_dyn.P(1,3)+(macro_dyn.P(2,3)-1)/gamma)/(phi-theta1-macro_dyn.P(1,1)-macro_dyn.P(2,1)/gamma);
-            %corresponding solution for Q, which designates the loadings
-            %onto the orthogonalizes shocks u_t
+            % Corresponding solution for Q, which designates the loadings
+            % onto the orthogonalizes shocks u_t
             macro_dyn.Q      = zeros(3,4);
             
             macro_dyn.Q(:,2:4) = Sigma*Mtemp(1:2,1:3);
@@ -195,7 +195,7 @@ classdef macro_dyn
             Qs(i,:,:)         = macro_dyn.Q;
         end
         
-       %We used the first solution as the best, even though we have 2 or more solutions
+       % We used the first solution as the best, even though we have 2 or more solutions
        macro_dyn.eigenvalues_select = evec2(select_mat(1,:)); 
        macro_dyn.P          = reshape(Ps(1,:,:),3,3);
        macro_dyn.Q          = reshape(Qs(1,:,:),3,4);
@@ -234,45 +234,45 @@ classdef macro_dyn
            logbetaq         = macro_dyn.gamma*macro_dyn.g-0.5*macro_dyn.gamma^2*macro_dyn.sigmac^2*lambda0^2-macro_dyn.rf;
            macro_dyn.betaq  = exp(logbetaq);
        
-            % Save implied parameters
-            macro_dyn.ImpliedParams = [macro_dyn.betaq^4, macro_dyn.rhoxm, macro_dyn.rhoxp, macro_dyn.psi, macro_dyn.Sbar,... 
+           % Save implied parameters
+           macro_dyn.ImpliedParams = [macro_dyn.betaq^4, macro_dyn.rhoxm, macro_dyn.rhoxp, macro_dyn.psi, macro_dyn.Sbar,... 
                                        macro_dyn.smax, exp(macro_dyn.smax), macro_dyn.sigmac*200]';
             
-            % variance-covariance matrix of Q u_t
-            QSigma = macro_dyn.Q*macro_dyn.Sigmau*macro_dyn.Q';
+           % variance-covariance matrix of Q u_t
+           QSigma = macro_dyn.Q*macro_dyn.Sigmau*macro_dyn.Q';
+           
+           % Consumption volatility
+           macro_dyn.sigmac = sqrt(QSigma(1,1));
             
-            % consumption volatility
-            macro_dyn.sigmac = sqrt(QSigma(1,1));
+           % First row of A is proportional to first row of Q
+           A1 = [1,0,0]/macro_dyn.sigmac;
+           % pick A2 in the null space of A1*Q*Sigmau*Q'
+           null1 = null(A1*macro_dyn.Q*macro_dyn.Sigmau*macro_dyn.Q');
+           A2 = null1(:,1)';
+           % scale so that A2*u has unit variance
+           A2 = A2/sqrt(A2*macro_dyn.Q*macro_dyn.Sigmau*macro_dyn.Q'*A2');
+           % pick A3 in null space of Q
+           null2 = null(macro_dyn.Q(:,end-2:end)');
+           macro_dyn.A = [A1;A2;null2'];
             
-            % First row of A is proportional to first row of Q
-            A1 = [1,0,0]/macro_dyn.sigmac;
-            % pick A2 in the null space of A1*Q*Sigmau*Q'
-            null1 = null(A1*macro_dyn.Q*macro_dyn.Sigmau*macro_dyn.Q');
-            A2 = null1(:,1)';
-            % scale so that A2*u has unit variance
-            A2 = A2/sqrt(A2*macro_dyn.Q*macro_dyn.Sigmau*macro_dyn.Q'*A2');
-            % pick A3 in null space of Q
-            null2 = null(macro_dyn.Q(:,end-2:end)');
-            macro_dyn.A = [A1;A2;null2'];
-            
-            % Compute A^{-1}
-            macro_dyn.Ainv=inv(macro_dyn.A);
+           % Compute A^{-1}
+           macro_dyn.Ainv=inv(macro_dyn.A);
 
-            % Compute loading of v_* onto normalized vector of shocks \eps_t. Corresponds
-            % to vec_* in the appendix
-            macro_dyn.vast=macro_dyn.A*macro_dyn.Q*[0,0,0,1]'*macro_dyn.sigma_vec(4);
+           % Compute loading of v_* onto normalized vector of shocks \eps_t. Corresponds
+           % to vec_* in the appendix
+           macro_dyn.vast=macro_dyn.A*macro_dyn.Q*[0,0,0,1]'*macro_dyn.sigma_vec(4);
 
-            % sigmaperp = standard deviation of orthogonal component of v_* 
-            macro_dyn.sigmaperp = sqrt(macro_dyn.sigma_vec(4)-macro_dyn.vast'*macro_dyn.vast);
+           % sigmaperp = standard deviation of orthogonal component of v_* 
+           macro_dyn.sigmaperp = sqrt(macro_dyn.sigma_vec(4)-macro_dyn.vast'*macro_dyn.vast);
+           
+           % dynamics for scaled state vector \tilde P
+           macro_dyn.Ptilde                 = macro_dyn.A*macro_dyn.P/macro_dyn.A;
             
-            % dynamics for scaled state vector \tilde P
-            macro_dyn.Ptilde                 = macro_dyn.A*macro_dyn.P/macro_dyn.A;
-            
-            % unconditional variance and standard deviation of \tilde Z
-            % StdZtilde will be used determine the numerical grid for the value
-            % function iteration
-            macro_dyn.VarZtilde              = Uncon_var(macro_dyn.Ptilde, diag([1,1,0]));
-            macro_dyn.StdZtilde              = sqrt(diag(macro_dyn.VarZtilde));
+           % Unconditional variance and standard deviation of \tilde Z
+           % StdZtilde will be used determine the numerical grid for the value
+           % function iteration
+           macro_dyn.VarZtilde              = Uncon_var(macro_dyn.Ptilde, diag([1,1,0]));
+           macro_dyn.StdZtilde              = sqrt(diag(macro_dyn.VarZtilde));
       end
   end
 

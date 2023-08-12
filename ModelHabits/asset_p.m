@@ -116,7 +116,7 @@ classdef asset_p
         end
         %% Constructor method
         function asset = asset_p(G , Bn, Bnom, ImpliedParams)         
-        % this method initializes the class given some input arguments
+        % This method initializes the class given some input arguments
         % and fills the remaining ones with default values
             if nargin == 0
              asset.G                  = 0;
@@ -194,7 +194,7 @@ classdef asset_p
             ZT1                = zeros(T,1);
             Initial            = zeros(Nsim,1);
 
-            %Initialize all quantities before loop
+            % Initialize all quantities before loop
             rfrNomStd          = Initial;
             rho_nom_rfr        = Initial;
             std_dp             = Initial;
@@ -271,13 +271,13 @@ classdef asset_p
                 % Generate T draws of \epsilon_t
                 eps            = mvnrnd(Z13, diag([1,1,0]), T)';
 
-                %Independent shock to unit root component of inflation
+                % Independent shock to unit root component of inflation
                 epsperp        = mvnrnd(ZT1, 1, T)';
-                %shock to unit root component of inflation=component driven
-                %by \epsilon_t + independent shock
+                % Shock to unit root component of inflation=component driven
+                % by \epsilon_t + independent shock
                 uast           = vast'*eps+sigmaperp*epsperp;
                 
-                %initialize simulated time series
+                % Initialize simulated time series
                 ztildesim      = Z3T;
                 shatsim        = ZT1;
                 Yhat           = Z3T;
@@ -295,68 +295,68 @@ classdef asset_p
                 piast          = ZT1;
                 approxErrI     = ZT1;
 
-                %update state vector
+                % Update state vector
                 for t=3:T
-                    % dynamics for \tilde Z
+                    % Dynamics for \tilde Z
                     ztildesim(:,t) = Ptilde*ztildesim(:,t-1)+eps(:,t);
-                    % dynamics for \hat Y
+                    % Dynamics for \hat Y
                     Yhat(:,t)      = P*Yhat(:,t-1)+Ainv*eps(:,t);
-                    % dynamics for surplus consumption ratio relative to
+                    % Dynamics for surplus consumption ratio relative to
                     % steady-state
                     shatsim(t)     = ...
                         theta0*shatsim(t-1)+theta1*Yhat(1,t-1)+theta2*Yhat(1,t-2)+...
                         senshat(shatsim(t-1), Sbar)*sigmac*eps(1,t);
 
-                    %truncate state variables at upper and lower end of
-                    %grid, so we can use standard interpolation
+                    % Truncate state variables at upper and lower end of
+                    % grid, so we can use standard interpolation
                     zinterp        = max(zlower, min(ztildesim(:,t), zupper));
                     sinterp        = max(slower, min(shatsim(t), supper));
                     xminusinterp   = max(xminuslower, min(Yhat(1,t-1),xminusupper));
                     csim(t)        = g+csim(t-1)+(Yhat(1,t)-phi*Yhat(1,t-1));
                     piast(t)       = piast(t-1)+uast(t);
                      
-                    % scaling factors for nominal bonds
+                    % Scaling factors for nominal bonds
                     ePplus  = exp(20*piast(t));
                     ePminus = exp(19*piast(t));
                     
-                    %interpolate to obtain price-consumption ratio and real
-                    %and nominal bond prices with risk premia
+                    % Interpolate to obtain price-consumption ratio and real
+                    % and nominal bond prices with risk premia
                     qNDInterp = eqinterpnND2(z1grid, z2grid, z3grid, shat, xmgrid, ...
                                             {G5dim, Pnomplus5dim, Pnomminus5dim, Pplus5dim, Pminus5dim}, ...
                                             zinterp(1), zinterp(2), zinterp(3), ...
                                             sinterp, xminusinterp, 0);
                     
-                    %scale price-consumption ratio for consumption claim                    
+                    % Scale price-consumption ratio for consumption claim                    
                     PD(t)          = qNDInterp(1)/4;
                     
-                    %20-quarter bond prices
+                    % 20-quarter bond prices
                     Pnomplus(t)    = qNDInterp(2)/ePplus;
                     Pplus(t)       = qNDInterp(4);
 
-                    %19-quarter bond prices
+                    % 19-quarter bond prices
                     Pnomminus(t)   = qNDInterp(3)/ePminus;
                     Pminus(t)      = qNDInterp(5);
                     
-                    %interpolate to obtain risk neutral price-consumption ratio and real
-                    %and nominal bond prices 
+                    % Interpolate to obtain risk neutral price-consumption ratio and real
+                    % and nominal bond prices 
                     qNDInterp_rn = eqinterpnND2(z1grid, z2grid, z3grid, shat, xmgrid, ...
                                             {G5dim_rn, Pnomplus5dim_rn, Pnomminus5dim_rn, Pplus5dim_rn, Pminus5dim_rn}, ...
                                             zinterp(1), zinterp(2), zinterp(3), ...
                                             sinterp, xminusinterp, 0);
                     
-                    %scale risk-neutral price-consumption ratio for
-                    %consumption claim 
+                    % Scale risk-neutral price-consumption ratio for
+                    % consumption claim 
                     PD_rn(t)          = qNDInterp_rn(1)/4;
                     
-                    %risk-neutral 20-quarter bond prices
+                    % Risk-neutral 20-quarter bond prices
                     Pnomplus_rn(t)    = qNDInterp_rn(2)/ePplus;
                     Pplus_rn(t)       = qNDInterp_rn(4);
                     
-                    %risk-neutral 19-quarter bond prices
+                    % Risk-neutral 19-quarter bond prices
                     Pminus_rn(t)      = qNDInterp_rn(5);
                     Pnomminus_rn(t)   = qNDInterp_rn(3)/ePminus;
                     
-                    % approximation error for 1-period nominal rate
+                    % Approximation error for 1-period nominal rate
                     approxErrI(t) = .5*([0,1,0]*Q(:,2:4) + [0,0,1])*Sigmau(2:4,2:4)*([0,1,0]*Q(:,2:4) + [0,0,1])'+ gamma*(senshat(shatsim(t), Sbar) + 1)*QM(2:4)*Sigmau(2:4,2:4)*([0,1,0]*Q(:,2:4) + [0,0,1])';     
                 end
                 % 5-year nominal and real bond yields in annualized percent (in logs!)
@@ -399,27 +399,27 @@ classdef asset_p
                 % by smoothed dividends
                 PDlev              = delta.*PD.*exp(csim)./dDelta_bar;	
                 
-                %1-quarter nominal yield
+                % 1-quarter nominal yield
                 rfr_nom            = 400*([0,0,1]*Yhat+piast+rf);
                 
                 % Level return on consumption claim
                 Ret              = exp((csim(2:end)-csim(1:end-1))).*(1+4*PD(2:end))./(4*PD(1:end-1));
                 Ret_rn           = exp((csim(2:end)-csim(1:end-1))).*(1+4*PD_rn(2:end))./(4*PD_rn(1:end-1));
 
-                % log return on levered equity
+                % Log return on levered equity
                 reteq              = log((1/delta)*Ret - ((1-delta)/delta)*exp(rfr(1:end-1)'/400));
                 reteq_rn           = log((1/delta)*Ret_rn - ((1-delta)/delta)*exp(rfr(1:end-1)'/400));
 
-                % in percentage units in excess of the riskfree rate
+                % In percentage units in excess of the riskfree rate
                 reteq              = 100*reteq - rfr(1:end-1)'/4;
                 reteq_rn           = 100*reteq_rn - rfr(1:end-1)'/4;
                 
-                % log excess nominal bond returns in percent but not
+                % Log excess nominal bond returns in percent but not
                 % annualized
                 retnom             = 100*log(Pnomminus(2:end))-100*log(Pnomplus(1:end-1))-rfr_nom(1:end-1)'/4;
                 retnom_rn          = 100*log(Pnomminus_rn(2:end))-100*log(Pnomplus_rn(1:end-1))-rfr_nom(1:end-1)'/4;
                 
-                % log excess real bond returns in percent but not
+                % Log excess real bond returns in percent but not
                 % annualized
                 retreal            = 100*log(Pminus(2:end))-100*log(Pplus(1:end-1))-rfr(1:end-1)'/4;
                 retreal_rn         = 100*log(Pminus_rn(2:end))-100*log(Pplus_rn(1:end-1))-rfr(1:end-1)'/4;
@@ -427,34 +427,34 @@ classdef asset_p
                 % Drop observations to ensure that returns and prices have
                 % the same length
                 
-                %nominal and real log yield spreads
+                % Nominal and real log yield spreads
                 spreadNom          	= y5nom'-rfr_nom;
                 spreadReal          = y5real'-rfr;
                 
                 % 1-year log equity excess returns in natural units
                 ret1yr             = conv(reteq,ones(1,4),'valid')/100;
                                 
-                %levered price-dividend ratio
+                % Levered price-dividend ratio
                 pdlev=log(PDlev);
                                
-                % compute cash-flow news and real rate news
+                % Compute cash-flow news and real rate news
                 % vectors to compute equity real rate news analytically according to
                 % Campbell and Ammer 
                 rho                = asset_pI.rho;              
                 rhoIPinv           = inv(eye(3)-rho*P);
                 Gammaeq_rr            = -rho*([0,0,1]-[0,1,0]*P)*rhoIPinv*Ainv;
                    
-                % cash-flow news of stock and bond returns
+                % Cash-flow news of stock and bond returns
                 reteq_cf           = reteq_rn-(100*Gammaeq_rr*eps)';
                 retnom_cf      = retnom_rn-retreal_rn;
                                
-                % risk premium excess returns of stock and bond returns
+                % Risk premium excess returns of stock and bond returns
                 reteq_rp=reteq-reteq_rn;
                 retnom_rp=retnom-retnom_rn;  
                 
                 %% compute covariance matrix and correlation matrix of stock
-                %and bond return decomposition
-                %covariances in percent
+                % and bond return decomposition
+                % covariances in percent
                 CovDecomposition(j,:,:) = cov([retnom_cf, retnom_rn-retnom_cf, retnom_rp, reteq_cf, reteq_rn-reteq_cf, reteq_rp]);
                 CorrDecomposition(j,:,:)= corrcoef([retnom_cf, retnom_rn-retnom_cf, retnom_rp, reteq_cf, reteq_rn-reteq_cf, reteq_rp]);
                 
@@ -465,7 +465,7 @@ classdef asset_p
                 %std. log equity excess returns
                 Stdeq(j)           = std(reteq)*2;
                 
-                % exp(mean(log pd))
+                % Exp(mean(log pd))
                 mean_pdlev(j)     = exp(mean(pdlev));
                 % Standard deviation of log dp
                 std_dp(j)          = std(pdlev);               
@@ -481,12 +481,12 @@ classdef asset_p
 
                 %% Nominal bond moments
                
-                %nominal term premium
+                % Nominal term premium
                 BondPremium(j)     = 4*(mean(retnom) + .5*std(retnom)^2/100);
-                %std of bond returns
+                % Std of bond returns
                 Stdnom(j)          = std(retnom)*2;               
                 
-                %mean and std of log yield spread
+                % Mean and std of log yield spread
                 TermSlope(j)       = mean(spreadNom);
                 TermSlopeStd(j)    = std(spreadNom);
                 
@@ -498,7 +498,7 @@ classdef asset_p
                 ret1yrNom             = retnom(4:end)+retnom(3:end-1)+retnom(2:end-2)+retnom(1:end-3);
                 ret1yrNom             = ret1yrNom/100;               
                 
-                % multiply returns by 100 to match units in
+                % Multiply returns by 100 to match units in
                 % empirical exercise     
                 [ys1_coef,~,~,~,R2_ys1]           = regress(100*ret1yrNom, [ones(size(spreadNom(1:end-4)')), spreadNom(1:end-4)']);
                 ys1(j)             = ys1_coef(2);
@@ -506,24 +506,24 @@ classdef asset_p
                 
                 %% Cross-asset 
                 
-                %bond-stock return correlations
+                % Bond-stock return correlations
                 bondstock_corr_temp     = corrcoef(retnom, reteq);
                 tipsstock_corr_temp     = corrcoef(retreal, reteq);
                 correlations(j,:)       = [bondstock_corr_temp(1,2), tipsstock_corr_temp(1,2)];
                
-                %nominal bond beta
+                % Nominal bond beta
                 beta_temp           = regress(retnom, [ones(T-burn1+1,1), reteq]);
                 beta_nom(j)         = beta_temp(2);
                                     
                 
                 %% Real bonds
                 
-                %Term premium
+                % Term premium
                 RealBondPremium(j) = 4*(mean(retreal) + .5*std(retreal)^2/100);
-                %std returns
+                % Std returns
                 Stdreal(j)         = std(retreal)*2;
                 
-                %Mean and std. log yield spread
+                % Mean and std. log yield spread
                 TermSlopeReal(j)   = mean(spreadReal);
                 TermSlopeRealStd(j)= std(spreadReal);
                 % Real bond beta
@@ -533,39 +533,39 @@ classdef asset_p
                 
                 %% macro dynamics
                 
-                %std and AR(1) of changes in nominal 1-quarter yield
+                % Std and AR(1) of changes in nominal 1-quarter yield
                 rfrNomStd(j)       = std(rfr_nom(2:end)-rfr_nom(1:end-1));
                 rfr_nom_corr       = corrcoef(rfr_nom(3:end)-rfr_nom(2:end-1),rfr_nom(2:end-1)-rfr_nom(1:end-2));
                 rho_nom_rfr(j)     = rfr_nom_corr(1,2);
                 
-                %inflation changes
+                % Inflation changes
                 piChanges            = 4*(100*Yhat(2,1:end-1)+100*piast(1:end-1) - (100*Yhat(2,2:end)+100*piast(2:end)));
                 piChangeVol(j)       = std(piChanges);
                 piChangeAR1temp      = corrcoef(piChanges(1:end-1), piChanges(2:end));
                 piChangeAR1(j)       = piChangeAR1temp(1,2);
                 
-                %log consumption growth
+                % Log consumption growth
                 consGrowthVol(j)     = 2*std(100*(csim(2:end)-csim(1:end-1)));
                 consGrowthAR1temp    = corrcoef(csim(2:end-1)-csim(1:end-2),csim(3:end)-csim(2:end-1));
                 consGrowthAR1(j)     = consGrowthAR1temp(1,2);                      
                 
-                %output gap
+                % Output gap
                 xVol(j)              = std(100*Yhat(1,:));
                 xAR1temp             = corrcoef(Yhat(1,2:end), Yhat(1,1:end-1));
                 xAR1(j)              = xAR1temp(1,2);
           
-                %fraction s_t>s^max
+                % Fraction s_t>s^max
                 fracmax(j)         = sum(shatsim+log(Sbar)>smax)/T;
-                %std of approximation error for 1-period nominal rate in
-                %annualized percent
+                % Std of approximation error for 1-period nominal rate in
+                % annualized percent
                 stdApproxErrI(j)     = std(approxErrI)*400;
                 
-                %skip simulation run if PDlev turns negative
+                % Skip simulation run if PDlev turns negative
                 if min(PDlev)<0
                     j=j+1;
                     continue
                 end
-                %increase loop counter
+                % Increase loop counter
                 j=j+1;               
             end
             % End of loop average across Nsim simulations
@@ -708,19 +708,19 @@ classdef asset_p
             fnew  = zeros( N1, N2, sizexm);
             
             %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-            %Evaluate two-period bond prices and one-period
-            %consumption-claim using analytic expressions
+            % Evaluate two-period bond prices and one-period
+            % consumption-claim using analytic expressions
             
-            %Implement analytic expressions for one-period zero-coupon
-            %consumption claim 
+            % Implement analytic expressions for one-period zero-coupon
+            % consumption claim 
             
-            %asset prices with risk premia
+            % Asset prices with risk premia
             if risk_neutral_run == 0
                 % Define temporary constants outside the loop to calculate them only once
                 const1 =  g;
                 const2 =  [1,0,0]*( P- phi*eye(3))* Ainv;
                 const3 = ([0,0,1]-[0,1,0]* P)* Ainv;
-                %i1 loops over grid points for \tilde Z
+                % i1 loops over grid points for \tilde Z
                 for i1=1: N1
                     % i2 loops over grid points for \hat s_t
                     for i2=1: N2
@@ -731,13 +731,13 @@ classdef asset_p
                     end
                 end
                 
-            %risk-neutral asset prices   
+            % Risk-neutral asset prices   
             else
                 % Define temporary constants for risk-neutral asset prices outside the loop to calculate them only once
                 const1 =  g;
                 const2 =  [1,0,0]*( P- phi*eye(3))* Ainv;
                 const3 = ([0,0,1]-[0,1,0]* P)* Ainv;
-                %i1 loops over grid points for \tilde Z
+                % i1 loops over grid points for \tilde Z
                 for i1=1: N1
                     % i2 loops over grid points for \hat s_t
                     for i2=1: N2
@@ -755,15 +755,15 @@ classdef asset_p
             % Implement analytic expressions for two-period real and
             % nominal bonds 
             
-            %define temporary constants outside the loop to calculate them only once
+            % Define temporary constants outside the loop to calculate them only once
             const1 = -([0,0,1]-[0,1,0]* P)*(eye(3)+ P)* Ainv;
             const2 = -[0,0,1]*(eye(3)+ P)* Ainv;
             vr2     = ([0,0,1]-[0,1,0]* P)* Q;
             vbn2    = [0,1,1]*Q+2*[0,0,0,1];
             
-            %asset priceswith risk premia
+            % Asset priceswith risk premia
             if risk_neutral_run == 0
-                %i1 loops over grid points for \tilde Z
+                % i1 loops over grid points for \tilde Z
                 for i1 = 1:N1
                     % i2 loops over grid points for \hat s_t
                     for i2 = 1:N2
@@ -775,9 +775,9 @@ classdef asset_p
                     end
                 end
                 
-            %risk-neutral asset prices    
+            % Risk-neutral asset prices    
             else
-                %i1 loops over grid points for \tilde Z
+                % i1 loops over grid points for \tilde Z
                 for i1 = 1:N1
                     % i2 loops over grid points for \hat s_t
                     for i2 = 1:N2
@@ -791,11 +791,11 @@ classdef asset_p
             end
            
             %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-            %prepare inputs to speed up the evaluation of the
-            %numerical expectation outside the loop that evaluates the
-            %recursion
+            % Prepare inputs to speed up the evaluation of the
+            % numerical expectation outside the loop that evaluates the
+            % recursion
             
-            % distribution of \tilde Z_{t+1} conditional on \tilde Z_t       
+            % Distribution of \tilde Z_{t+1} conditional on \tilde Z_t       
             % initialize distributions for three dimensions of \tilde
             % Z_{t+1}
             zp               = zeros(N1, GLpoints);
@@ -803,19 +803,19 @@ classdef asset_p
             zp3              = zeros(N1, GLpoints3);
             % i1 loops over grid for \tilde Z_t
             for i1=1: N1
-                %E \tilde Z_{t+1} conditional on Z_t 
+                % E \tilde Z_{t+1} conditional on Z_t 
                 ztmp         =  Ptilde* Z(i1,:)';
-                %Distribution of first dimension of \tilde Z_{t+1} conditional on \tilde Z_t
+                % Distribution of first dimension of \tilde Z_{t+1} conditional on \tilde Z_t
                 zp(i1,:)     = [1,0,0]*ztmp+ xGL;
-                %Distribution of second dimension of \tilde Z_{t+1} conditional on \tilde Z_t
+                % Distribution of second dimension of \tilde Z_{t+1} conditional on \tilde Z_t
                 zp2(i1,:)    = [0,1,0]*ztmp+ xGL2;
-                %Distribution of first dimension of \tilde Z_{t+1} conditional on \tilde Z_t. 
+                % Distribution of first dimension of \tilde Z_{t+1} conditional on \tilde Z_t. 
                 % Notice that zp3 is constant across its third dimension, because the shock \epsilon_{3,t+1} has zero variance by construction.                
                 zp3(i1,:)    = [0,0,1]*ztmp+ 0*xGL3;
             end
             
             %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-            % create map between Z and Ztilde. 
+            % Create map between Z and Ztilde. 
             
             % Ai(i1,i4)=1 if and only if the last two dimensions of Z(i1,:)
             % agree with Ztilde(i4,:)
@@ -830,7 +830,7 @@ classdef asset_p
             end
             
             %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-            % prep grid and probabilities so we can take expectations over
+            % Prep grid and probabilities so we can take expectations over
             % dimensions 2 and 3 of \epsilon_{t+1} in one step by taking the 
             % product of probabilities times realized values along grid for 
             % \tilde Z_{2,t+1} and \tilde Z_{3,t+1}
@@ -854,7 +854,7 @@ classdef asset_p
             [p2, p3]     = meshgrid( prob2,  prob3);
             probtilde    = p2.*p3;
 
-            % split up vec*\epsilon_{t+1}=vec*(1)\epsilon_{1,t+1}
+            % Split up vec*\epsilon_{t+1}=vec*(1)\epsilon_{1,t+1}
             % +vec*(2)\epsilon_{2,t+1}+vec*(3)\epsilon_{3,t+1}
             % uast1, uast2, uast3 save the distribution of the three
             % components. This preallocation again serves to improve speed
@@ -877,19 +877,19 @@ classdef asset_p
             % Pre-allocate inflation shock distribution for speed
             vpi          = [0,1,0]* Ainv;
             vpi1         = vpi(1)* xGL';
-            %inflation shocks driven by \epsilon_{2,t+1} and
-            %\epsilon_{3,t+1}. vpi_mesh varies with \epsilon_{2,t+1} along rows and with \epsilon_{3,t+1} along columns  
+            % Inflation shocks driven by \epsilon_{2,t+1} and
+            % \epsilon_{3,t+1}. vpi_mesh varies with \epsilon_{2,t+1} along rows and with \epsilon_{3,t+1} along columns  
             vpi2         = vpi(2)* xGL2';
             vpi3         = vpi(3)* xGL3';
             [vpia2, vpia3] = meshgrid(vpi2, vpi3);
             vpi_mesh       = vpia2+vpia3;
 
             %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-            % prep interpolation along grid for x^- to improve speed
+            % Prep interpolation along grid for x^- to improve speed
             % within the main recursion
             
-            %for each value in X(i1) weightlow(i1) is such that
-            %X(i1)=weightlow(i1)*xmgrid(1)+(1-weightlow(i1)*xmgrid(2)
+            % For each value in X(i1) weightlow(i1) is such that
+            % X(i1)=weightlow(i1)*xmgrid(1)+(1-weightlow(i1)*xmgrid(2)
             mapxlow=zeros( N1,1);
             mapxhigh=zeros( N,1);
             weightlow=zeros( N1,1);
@@ -912,9 +912,9 @@ classdef asset_p
             const4 = -0.5* gamma*(1- theta0);
             
             %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-            %initialize matrices used to extract asset prices along
-            %sub-dimensions of the grid within the loop to help with speed and 
-            %memory
+            % Initialize matrices used to extract asset prices along
+            % sub-dimensions of the grid within the loop to help with speed and 
+            % memory
             InitialSheet     = zeros( N2, sizexm);
             InitCondit       = zeros( N3,1);
             
@@ -931,7 +931,7 @@ classdef asset_p
             asset_pI.Bnom(1,:,:,:)    = exp(bnnew);
             
             %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-            % evaluate asset pricing recursion
+            % Evaluate asset pricing recursion
             % n loops over the maturity of zero coupon bonds/consumption claims
             % The maturity of the zero-coupon consumption claim equals n and the maturity of the 
             % zero coupon bonds equals n+1
@@ -941,7 +941,7 @@ classdef asset_p
             % coupon bonds. Variables ending on _plus refer to distributions
             % at time t+1.
             for n=2: NN
-                % log of n-1 period price-dividend ratio, real bond price and nominal bond price
+                % Log of n-1 period price-dividend ratio, real bond price and nominal bond price
                 f_old      = fnew;
                 bn_old      = bnew;
                 bnom_old     = bnnew;
@@ -958,7 +958,7 @@ classdef asset_p
 
                         % i3 loops over lagged output gap x_{t-1}
                         for i3=1: sizexm
-                            % distribution of time t+1 log surplus
+                            % Distribution of time t+1 log surplus
                             % consumption ratio
                             s_plus           = reshape( splusgrid(i1,i2,i3,1,:)  ,  1,  GLpoints);
 
@@ -976,7 +976,7 @@ classdef asset_p
                             % i4 loops over points in Ztilde, i.e. the grid
                             % for dimensions 2 and 3 
                             for i4=1: N3
-                                % find points in Z corresponding to
+                                % Find points in Z corresponding to
                                 % Ztilde(i4,:)
                                 a     = Ai(:,i4);
                                 
@@ -987,8 +987,8 @@ classdef asset_p
                                 z1pi  = real(zp(i1,:));
                                 
                                     % Prepare interpolation/extrapolation of f_{n-1,t+1}(\tilde
-                                    %Z_{1,t+1},s_{t+1},x_t) over \tilde
-                                    %Z_{1,t+1} and s_{t+1}
+                                    % Z_{1,t+1},s_{t+1},x_t) over \tilde
+                                    % Z_{1,t+1} and s_{t+1}
                                     M           = size(z1grid,1);
                                     [~,XIPOS1]  = histc(min(z1pi,max(X)),z1grid);
                                     XIPOS1      = max(XIPOS1,1);
@@ -1001,20 +1001,20 @@ classdef asset_p
                                     XIPOS2      = min(XIPOS2,M-1);
                                     T2          =(s_plus-shat(XIPOS2))./(shat(XIPOS2+1)-shat(XIPOS2));
                                     
-                                    %interpolate f_{n-1,t+1}(\tilde
-                                    %Z_{1,t+1},s_{t+1},x_t) over \tilde
-                                    %Z_{1,t+1}, i.e. first dimension of
-                                    %\tilde Z_{t+1}
+                                    % Interpolate f_{n-1,t+1}(\tilde
+                                    % Z_{1,t+1},s_{t+1},x_t) over \tilde
+                                    % Z_{1,t+1}, i.e. first dimension of
+                                    % \tilde Z_{t+1}
                                     FS1         = (1-T1).*diag(fmesh_old(XIPOS2, XIPOS1))+T1.*diag(fmesh_old(XIPOS2, XIPOS1+1));
                                     FS2         = (1-T1).*diag(fmesh_old(XIPOS2+1, XIPOS1))+T1.*diag(fmesh_old(XIPOS2+1, XIPOS1+1));
                                                                         
-                                    %interpolate f_{n-1,t+1}(\tilde
-                                    %Z_{1,t+1},s_{t+1},x_t) over s_{t+1}
+                                    % Interpolate f_{n-1,t+1}(\tilde
+                                    % Z_{1,t+1},s_{t+1},x_t) over s_{t+1}
                                     fs_plus          = (1-T2').*FS1+T2'.*FS2;
                                     
-                                    %this is the recursion equation for
-                                    %consumption claims as detailed in
-                                    %Appendix section D.1.3
+                                    % This is the recursion equation for
+                                    % consumption claims as detailed in
+                                    % Appendix section D.1.3
                                     if risk_neutral_run == 0
                                         fs_plus = fs_plus' + const2 + const1 * Z(i1,:)' - rf - const3 * Z(i1,:)' + const4 * (1 - 2* shat(i2)) - (gamma * (1+ lambdas(i2))- 1) * ve1;
                                     else 
@@ -1022,9 +1022,9 @@ classdef asset_p
                                     end
                                 Fconditional(i4)      = real(exp(fs_plus)* prob1);
                                 
-                                %for n<= maximum bond maturity do the same
-                                %calucation to obtain Bconditional and
-                                %Bnconditional
+                                % For n<= maximum bond maturity do the same
+                                % calucation to obtain Bconditional and
+                                % Bnconditional
                                 if n < Nbonds
                                     % Interpolate log-linearly to evaluate
                                     % b_{n-1,t+1}(\tilde
@@ -1034,23 +1034,23 @@ classdef asset_p
                                     Bnmesh_old            = reshape(bnom_old(a>0,:,mapxlow(i1)), N,  N2)'*weightlow(i1)+reshape(bnom_old(a>0,:,mapxhigh(i1)),  N,  N2)'*(1-weightlow(i1));
                                     
                                     % Interpolate b_{n-1,t+1}(\tilde
-                                    %Z_{1,t+1},s_{t+1},x_t) over \tilde
-                                    %Z_{1,t+1} and s_{t+1}
+                                    % Z_{1,t+1},s_{t+1},x_t) over \tilde
+                                    % Z_{1,t+1} and s_{t+1}
                                         FS1         = (1-T1).*diag(bmesh_old(XIPOS2, XIPOS1))+T1.*diag(bmesh_old(XIPOS2, XIPOS1+1));
                                         FS2         = (1-T1).*diag(bmesh_old(XIPOS2+1, XIPOS1))+T1.*diag(bmesh_old(XIPOS2+1, XIPOS1+1));
                                         bs_plus          = (1-T2').*FS1+T2'.*FS2;
 
                                     % Interpolate b^\$_{n-1,t+1}(\tilde
-                                    %Z_{1,t+1},s_{t+1},x_t) over \tilde
-                                    %Z_{1,t+1} and s_{t+1}
+                                    % Z_{1,t+1},s_{t+1},x_t) over \tilde
+                                    % Z_{1,t+1} and s_{t+1}
                                         FS1         = (1-T1).*diag(Bnmesh_old(XIPOS2, XIPOS1))+T1.*diag(Bnmesh_old(XIPOS2, XIPOS1+1));
                                         FS2         = (1-T1).*diag(Bnmesh_old(XIPOS2+1, XIPOS1))+T1.*diag(Bnmesh_old(XIPOS2+1, XIPOS1+1));
                                         bns_plus         = (1-T2').*FS1+T2'.*FS2;
                                         
                                         
-                                    %these are the recursion equations for
-                                    %real and nominal bonds as detailed in
-                                    %Appendix section D.1.3    
+                                    % These are the recursion equations for
+                                    % real and nominal bonds as detailed in
+                                    % Appendix section D.1.3    
                                     if risk_neutral_run == 0
                                         bs_plus = bs_plus' - rf - const3 * Z(i1,:)' -0.5 * gamma * (1- theta0) * (1 - 2 * shat(i2)) - gamma * (1 + lambdas(i2)) * ve1;
                                         bns_plus = bns_plus' - rf - [0,0,1] * Ainv * Z(i1,:)' - 0.5 * gamma * (1- theta0) * (1 - 2*shat(i2)) - ...
@@ -1068,25 +1068,25 @@ classdef asset_p
                             % Bconditional, Bnconditional over the last two
                             % dimensions of \tilde Z_{t+1}
                             
-                            %distributions of \tilde Z_{2,t+1} and \tilde
-                            %Z_{3,t+1} conditional on \tilde Z_t
+                            % Distributions of \tilde Z_{2,t+1} and \tilde
+                            % Z_{3,t+1} conditional on \tilde Z_t
                             zp2i                      = real(zp2(i1,:)');
                             zp3i                      = real(zp3(i1,:)');
                             
-                            %take expectation of Fconditional over \tilde
-                            %Z_{2,t+1} and \tilde Z_{3,t+1}
+                            % Take expectation of Fconditional over \tilde
+                            % Z_{2,t+1} and \tilde Z_{3,t+1}
                             sheet(i2,i3) = expectedinterpolated(Fconditional, zp2i, zp3i, probtilde,  N, X2, X3);
                             
                             if n< Nbonds
-                            %take expectation over Bconditional over \tilde
-                            %Z_{2,t+1} and \tilde Z_{3,t+1}
+                            % Take expectation over Bconditional over \tilde
+                            % Z_{2,t+1} and \tilde Z_{3,t+1}
                                 sheetB(i2,i3) = expectedinterpolated(Bconditional, zp2i, zp3i, probtilde,  N, X2, X3);
                                 
-                            %Before taking expectations over Bnconditional
-                            %multiply probabilities by the shock to bond
-                            %cash flows due to inflation that is perfectly
-                            %correlated with \epsilon_{2,t+1} and
-                            %\epsilon_{3,t+1}
+                            % Before taking expectations over Bnconditional
+                            % multiply probabilities by the shock to bond
+                            % cash flows due to inflation that is perfectly
+                            % correlated with \epsilon_{2,t+1} and
+                            % \epsilon_{3,t+1}
                                 probnom               = probtilde.*exp(-vpi_mesh-(n+1)*ua_mesh);
                                 sheetBn(i2,i3)          = expectedinterpolated(Bnconditional, zp2i, zp3i, probnom,  N, X2, X3);
                             end
@@ -1130,9 +1130,9 @@ classdef asset_p
         
             function Expected  = expectedinterpolated(Fconditional, zp2i, zp3i, probtilde, N, X2, X3)
 
-                %bound Fconditional away from zero to avoid error messages
+                % Bound Fconditional away from zero to avoid error messages
                 Fconditional                 = max(Fconditional, 10^(-320));
-                %take log - we interpolate log-linearly
+                % Take log - we interpolate log-linearly
                 fcond                        = log(reshape(Fconditional, [N,N]));
                 z2grid                       = X2(:,1,1);
                 z3grid                       = X3(1,:,1)';
@@ -1145,9 +1145,6 @@ classdef asset_p
                 APDs     = (1:PDs)';
                 fcond        = reshape(fcond,[VORGSIZE(1), PDs]);
                 XExt     = {cast(z2grid(:),'double'),APDs};
-                %[XExt,YExt]  = ndgrid(zp2i(:),APDs);
-                %finterp2       =  interpn(z2grid(:),APDs,fcond,XExt, YExt);
-                %finterp2       =  cast(reshape(interpn(z2grid(:),APDs,fcond,XExt, YExt),[length(zp2i), Ds]),superiorfloat(z2grid,fcond,zp2i));
                 F        = griddedInterpolant(XExt,fcond,'linear');
                 finterp2       = cast(reshape(F({cast(zp2i(:),class(XExt{1})),APDs}),[length(zp2i), Ds]),superiorfloat(z2grid,fcond,zp2i));
                 tmp                          = finterp2';
@@ -1158,15 +1155,12 @@ classdef asset_p
                 APDs     = (1:PDs)';
                 tmp       = reshape(tmp,[VORGSIZE(1), PDs]);
                 XExt     = {cast(z3grid(:),'double'),APDs};
-                %[XExt,YExt]  = ndgrid(zp3i(:),APDs);
-                %tmp1       =  interpn(z3grid(:),APDs,tmp,XExt, YExt);
-                %tmp1       =  cast(reshape(interpn(z3grid(:),APDs,tmp,XExt, YExt),[length(zp3i), Ds]),superiorfloat(z3grid,tmp,zp3i));
                 F        = griddedInterpolant(XExt,tmp,'linear');
                 tmp1     = cast(reshape(F({cast(zp3i(:),class(XExt{1})),APDs}),[length(zp3i), Ds]),superiorfloat(z3grid,tmp,zp3i));
 
-                %take expectation by summing over Fconditional(\tilde
-                %Z_{2,t+1}, \tilde Z_{3,t+1})*prob(\tilde
-                %Z_{2,t+1}, \tilde Z_{3,t+1})
+                % Take expectation by summing over Fconditional(\tilde
+                % Z_{2,t+1}, \tilde Z_{3,t+1})*prob(\tilde
+                % Z_{2,t+1}, \tilde Z_{3,t+1})
                 Expected                     = max(real(sum(sum(exp(tmp1).*probtilde))),10^(-320));
             return 
             end

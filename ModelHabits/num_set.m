@@ -98,11 +98,11 @@ classdef num_set
             countpoints(2,1:N)    = (1:N);
             countpoints(3,1:N)    = (1:N);
 
-            % generate gridpoints for each dimension of Ztilde
-            %zgrid is [3xN]
+            % Generate gridpoints for each dimension of Ztilde
+            % zgrid is [3xN]
             zgrid = -repmat(num_set.m.*macro_dyn.StdZtilde, 1, N)+ 2*(countpoints-1).*repmat(num_set.m.*macro_dyn.StdZtilde./(N-1), 1, N);  
 
-            % reshape zgrid into [N^3x3]. num_set.Z lists all possible
+            % Reshape zgrid into [N^3x3]. num_set.Z lists all possible
             % combinations of points in zgrid
             [z1, z2, z3] = ndgrid(zgrid(1,:), zgrid(2,:), zgrid(3,:)); 
             z1=reshape(z1,1,N^3); 
@@ -129,8 +129,7 @@ classdef num_set
             num_set.xmgrid    = (min_X:(max_X-min_X)/(num_set.sizexm-1):max_X);
 
             % Generate points and weights for numerical integration
-            % use identical Gauss-Legendre parameters for dimensions 2 and
-            % 3
+            % use identical Gauss-Legendre parameters for dimensions 2 and 3
             num_set.GLpoints3              = num_set.GLpoints2;
             num_set.GLdomain3              = num_set.GLdomain2;
 
@@ -148,7 +147,7 @@ classdef num_set
 
             % Number of grid points for Ztilde
             num_set.N1                     = N^3;
-            %number of grid points for surplus consumption ratio
+            % Number of grid points for surplus consumption ratio
             num_set.N2                     = max(size(num_set.shat));
             % Number of grid points on subgrid for Ztilde covering only
             % dimensions 2 and 3
@@ -187,24 +186,24 @@ classdef num_set
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         function num_set = generatesplusgrid(num_set, macro_dyn)
         
-        %initialize splusgrid    
+        % Initialize splusgrid    
         InitialValue    = zeros(num_set.N1, num_set.N2, num_set.sizexm, num_set.N3, num_set.GLpoints);
         num_set.splusgrid       = InitialValue;
         
-        %consumption shock at each of the Gauss-Legendre points for
-        %\eps_{1,t+1}
+        % Consumption shock at each of the Gauss-Legendre points for
+        % \eps_{1,t+1}
         epsc                    = macro_dyn.sigmac*num_set.xGL;
         
-        %loop over grid for state vector and compute vector of possible
-        %values for s(t+1) for each Gauss-Legendre point of \eps_{1,t+1}
+        % Loop over grid for state vector and compute vector of possible
+        % values for s(t+1) for each Gauss-Legendre point of \eps_{1,t+1}
             for i1=1:num_set.N1
                 for i4=1:num_set.N3
                     for i5=1:num_set.GLpoints
                         for i2=1:num_set.N2
                             for i3=1:num_set.sizexm
                                 
-                                %use dynamic equation for surplus
-                                %consumption ratio
+                                % Use dynamic equation for surplus
+                                % consumption ratio
                                 sint  = macro_dyn.theta0*num_set.shat(i2)+macro_dyn.theta1*num_set.X(i1)+num_set.lambdas(i2)*epsc(i5);
                                 num_set.splusgrid(i1,i2,i3,i4,i5) = (sint+macro_dyn.theta2*num_set.xmgrid(i3));
                             end
@@ -226,15 +225,15 @@ classdef num_set
                 case {1,2,3,4,5}
                     switch(num_set.sfast)
                         case 1,
-                            %Grid 1: Analogous to original CC grid with 13 points
+                            % Grid 1: Analogous to original CC grid with 13 points
                             splot  = log(macro_dyn.Smax/13:macro_dyn.Smax/13:macro_dyn.Smax);
                             num_set.shat           = real(splot-macro_dyn.sbar);
                         case 2,
-                            %Grid 2: Analogous to original CC grid with 50 points
+                            % Grid 2: Analogous to original CC grid with 50 points
                             splot  = log(macro_dyn.Smax/50:macro_dyn.Smax/50:macro_dyn.Smax);
                             num_set.shat           = real(splot-macro_dyn.sbar);
                         case 3,
-                            %Grid 2: Analogous to original CC grid with 100 points
+                            % Grid 2: Analogous to original CC grid with 100 points
                             splot  = log(macro_dyn.Smax/100:macro_dyn.Smax/100:macro_dyn.Smax);
                             num_set.shat   = real(splot-macro_dyn.sbar);
                         case 4,
@@ -246,26 +245,26 @@ classdef num_set
 
                 case {6,7,8}
                     switch(num_set.sfast)
-                        case 6, %This is the case we mostly use with 50 grid points
+                        case 6, % This is the case we mostly use with 50 grid points
                             splotu  = log(macro_dyn.Smax/20:macro_dyn.Smax/20:macro_dyn.Smax);
-                            %lower segment as in Wachter
+                            % Lower segment as in Wachter
                             splot1  = (-50:(50+splotu)/30:min(splotu)-(50+splotu)/130);
                             splot   = horzcat(splot1, splotu); %concatenate arrays horizontally
                         case 7,
                             splotu  = log(macro_dyn.Smax/20:macro_dyn.Smax/20:macro_dyn.Smax);
-                            %lower segment as in Wachter
+                            % Lower segment as in Wachter
                             splot1=(-100:(100+splotu)/100:min(splotu)-(100+splotu)/130);
                             splot  = horzcat(splot1, splotu);
                         case 8,
-                            %This is the largest grid, exactly as in Wachter
-                            %Upper segment as in Wachter. 
+                            % This is the largest grid, exactly as in Wachter
+                            % Upper segment as in Wachter. 
                             splotu  = log(macro_dyn.Smax/101:macro_dyn.Smax/101:macro_dyn.Smax);
                             %lower segment as in Wachter
                             splot1=(-300:(300+splotu)/900:min(splotu)-(300+splotu)/900);
                             splot  = horzcat(splot1, splotu);
                     end
                     
-            %subtract sbar to obtain grid for surplus consumption ratio relative to steady-state        
+            % Subtract sbar to obtain grid for surplus consumption ratio relative to steady-state        
             num_set.shat = real(splot-macro_dyn.sbar);
             end
         end
