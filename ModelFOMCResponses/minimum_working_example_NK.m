@@ -205,8 +205,7 @@ R2RegRetOnPD1y                = R2_re1(1);
 
 
 % 10-YEAR NOMINAL BONDS
-% Yield Spread: Quarterly log returns on 10-year Treasury bonds in excess of the log nominal 3-month 
-% Treasury bill return
+% Yield Spread: The log 10-year bond yield minus the log nominal 3-month Treasury bill
 spreadNom                     = asset.simulated.y10nom'-asset.simulated.rfr_nom;
 meanLogYieldSpread            = mean(spreadNom);
 
