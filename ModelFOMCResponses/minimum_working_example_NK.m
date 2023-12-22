@@ -112,7 +112,7 @@ lag_trough=find(asset.Irftemp.c==min(asset.Irftemp.c))-1;
 Table3      =   [asset.stocks.equityPremium, asset.stocks.vol, asset.stocks.sharpeRatio, asset.stocks.rhoDP, asset.stocks.coeffRegRetOnPD1y, asset.stocks.R2RegRetOnPD1y]';
 Table3      =   [Table3; 0;  [asset.nominalBonds.meanLogYieldSpread, asset.nominalBonds.vol, asset.nominalBonds.coeffRegRetOnYS1y, asset.nominalBonds.R2RegRetOnYS1y]';...
                 0;asset.macroDynamics.consGrowthVol;asset.macroDynamics.iChangeVol];
-Table3      =   [Table3; 0; min(asset.Irftemp.c)/max(asset.Irftemp.i); lag_trough];
+Table3      =   [Table3; 0; min(100*asset.Irftemp.c)/max(asset.Irftemp.i); lag_trough];
 
 % Data moments
 Table3Data  = [7.89; 
@@ -233,7 +233,7 @@ iChangeVol                    = std(asset.simulated.rfr_nom(5:end)-asset.simulat
 % Replica_Table3: Replicating Table 3
 Replica_Table3  =   [equityPremium, vol_stocks, sharpeRatio_stocks, rhoDP(1,2), coeffRegRetOnPD1y, R2RegRetOnPD1y]';
 Replica_Table3  =   [Replica_Table3; 0;  [meanLogYieldSpread, vol_nbond, coeffRegRetOnYS1y, R2RegRetOnYS1y]';0;consGrowthVol;iChangeVol];
-Replica_Table3  =   [Replica_Table3; 0; min(asset.Irftemp.c)/max(asset.Irftemp.i); lag_trough];
+Replica_Table3  =   [Replica_Table3; 0; min(100*asset.Irftemp.c)/max(asset.Irftemp.i); lag_trough];
 Replica_Table3  =   [Replica_Table3, Table3Data];
 Replica_Table3  =   array2table(round(Replica_Table3,2));
 
