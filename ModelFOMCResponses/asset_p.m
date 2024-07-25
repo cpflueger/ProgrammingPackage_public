@@ -1187,7 +1187,7 @@ classdef asset_p
                     for i2=1: N2
                         % i3 loops over grid points for x_{t-1}
                         for i3=1: sizexm
-                            fnew(i1,i2,i3)= const1 + const2*Z(i1,:)' - 4*rf - const3*Z(i1,:)' + 0.5*sigmac^2;
+                            fnew(i1,i2,i3)= const1 + const2*Z(i1,:)' - rf - const3*Z(i1,:)' + 0.5*sigmac^2;
                         end
                     end
                 end
@@ -1465,7 +1465,7 @@ classdef asset_p
                                     if risk_neutral_run == 0
                                         fs_plus = fs_plus' + const2  + const1 * Z(i1,:)' - rf - const3 * Z(i1,:)' + const4 * (1 - 2* shat(i2)) - (gamma * (1+ lambdas(i2))- 1) * ve1;
                                     else
-                                        fs_plus = fs_plus' + const2 +  const1 * Z(i1,:)' - 4*rf - const3 * Z(i1,:)' + ve1;
+                                        fs_plus = fs_plus' + const2 +  const1 * Z(i1,:)' - rf - const3 * Z(i1,:)' + ve1;
                                     end
                                     Fconditional(i4)      = real(exp(fs_plus)* prob1);
                                 
@@ -1687,6 +1687,7 @@ classdef asset_p
             xminuslower        = min(xmgrid);
             
             xIrfSum = zeros(1,20);
+            shatsimIrfSum = zeros (20,1); 
             cIrfSum = zeros(20,1); 
             piIrfSum = zeros(1,20);
             iIrfSum = zeros(1,20);
@@ -1898,7 +1899,7 @@ classdef asset_p
                 j = j+1;
                 
                 xIrf       = Y(1,1:20) - Y(1,1);
-                cIrf = (csim(1:20) - csim_ss(1:20)) - (csim(1) - csim_ss(1)); 
+                cIrf       = (csim(1:20) - csim_ss(1:20)) - (csim(1) - csim_ss(1)); 
                 piIrf      = Y(2,1:20) - Y(2,1);
                 iIrf       = Y(3,1:20) - Y(3,1);
                 PDIrf      = (cumsum(reteq(1:20)-reteq(1)));
@@ -1923,6 +1924,7 @@ classdef asset_p
                 y10realIrf_rp  = y10realIrf - y10realIrf_rn;
                 
                 xIrfSum = xIrfSum + xIrf;
+                shatsimIrfSum = shatsimIrfSum + shatsimIrf; 
                 cIrfSum = cIrfSum + cIrf; 
                 piIrfSum = piIrfSum + piIrf;
                 iIrfSum = iIrfSum + iIrf;
@@ -1941,6 +1943,7 @@ classdef asset_p
             end
             xIrf = xIrfSum/Nsim;
             cIrf = cIrfSum/Nsim; 
+            shatsimIrf = shatsimIrfSum/Nsim; 
             piIrf = piIrfSum/Nsim;
             iIrf = iIrfSum/Nsim;
             PDIrf = PDIrfSum/Nsim;
@@ -1965,7 +1968,7 @@ classdef asset_p
             responsesObj.outputIn8QrtChange = responses(7);
             
             Irftemp.x=xIrf;
-            Irftemp.c = cIrf * 100; 
+            Irftemp.c = cIrf; 
             Irftemp.pi=piIrf;
             Irftemp.i=iIrf;
             Irftemp.PD=PDIrf;

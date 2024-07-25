@@ -67,7 +67,10 @@ classdef macro_dyn
            macro_dyn.rhoxm          = macro_dyn.theta2/(macro_dyn.phi - macro_dyn.theta1); 
            macro_dyn.psi            = 1/(macro_dyn.gamma*(macro_dyn.phi - macro_dyn.theta1));   
            %% Variance shocks vector
+           % The volatilities of non-MP shocks (e.g. demand or supply shocks) should not be changed because they may generate wrong results.
            macro_dyn.sigma_vec      = [10^(-9) 10^(-9) macro_dyn.sigma_vec(3) 10^(-9)];  
+           assert((macro_dyn.sigma_vec(1) == 10^(-9)) && (macro_dyn.sigma_vec(2) == 10^(-9)) && (macro_dyn.sigma_vec(4) == 10^(-9)),...
+                '@update_params: Do not change volatility of non-MP shocks. The asset price solution is not set up to handle this.')
            %% Industry portfolio betas
            macro_dyn.delta_betaport = [1.4813;1.0255;1.0255;0.9132;0.8031;0.7017;0.6802;0.6410;0.5376;0.4796];
        end
@@ -328,7 +331,7 @@ classdef macro_dyn
             % Solving the model in dynare
             dynare NK_dynare.mod
             % Loading model results
-            load NK_dynare_results.mat
+            load NK_dynare\Output\NK_dynare_results.mat
             
             % Obtaining the stable eigenvalues from the solved model in dynare
             stable_eigenval = find(abs(oo_.dr.eigval)<1);
