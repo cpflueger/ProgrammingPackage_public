@@ -1,0 +1,167 @@
+// This modifies the default settings for plotting.
+// It starts with s2color and modifies it
+
+#include s2color
+
+ 
+graphsize	          5
+graphsize x           7
+graphsize y           4
+ 
+
+gsize text	     	medium
+gsize heading	  	medium
+gsize subheading   	medium
+gsize axis_title 	medium
+gsize matrix_label	medium
+gsize label		    medium
+gsize tick_label    medium
+ 
+
+color background             white
+color plotregion             white
+color matrix_plotregion      white
+color legend                 white
+color plotregion_line        none
+color matplotregion_line     black
+color heading                black
+color grid		             "232 232 232" // light gray
+color major_grid             "232 232 232" // light gray
+color minor_grid		     "232 232 232" // light gray
+color tick                   black
+color legend_line            none
+color clegend_outer     	 none
+color clegend_inner      	none
+
+// Legend outside in lower right corner; 1 row; short signatures; no frame
+clockdir legend_position     4
+numstyle legend_cols         0
+numstyle legend_rows         1
+gsize legend_key_xsize       5
+
+gsize legend_row_gap    tiny
+gsize legend_col_gap    small
+gsize legend_key_gap    vsmall
+gsize legend_key_ysize  vsmall
+gsize key_label  		small
+
+gsize zyx2legend_key_gap    tiny
+gsize zyx2legend_key_xsize  small
+gsize zyx2legend_key_ysize  small
+gsize zyx2rowgap            zero
+gsize zyx2colgap            large
+
+
+linewidth p                  medium
+linewidth axisline           vthin
+linewidth tick               vthin
+linewidth minortick          vthin
+linewidth background         vthin
+linewidth foreground         vthin
+linewidth major_grid         vthin
+
+linewidth minor_grid         vthin
+linewidth xyline             vthin
+linewidth refline            vthin
+linewidth refmarker          vthin
+linewidth matrixmark         vthin
+linewidth dots               medium
+linewidth dot_line           vthin
+linewidth dot_area           vthin
+linewidth dotmark            vthin
+linewidth plotregion         vthin
+linewidth legend             vthin
+linewidth pie                vthin
+linewidth reverse_big        vthin
+linewidth sunflower          vthin
+linewidth matrix_plotregion  vthin
+linewidth text_option        vthin
+linewidth ci                 medium
+linewidth ci2                vthin
+linewidth ci_area            vthin
+linewidth ci2_area           vthin
+linewidth pbar               medium
+linewidth p1bar              medium
+linewidth p2bar              medium
+linewidth p3bar              medium
+linewidth p4bar              medium
+linewidth p5bar              medium
+linewidth p6bar              medium
+linewidth p7bar              medium
+linewidth p8bar              medium
+linewidth p9bar              medium
+linewidth p10bar             medium
+linewidth p11bar             medium
+linewidth p12bar             medium
+linewidth p13bar             medium
+linewidth p14bar             medium
+linewidth p15bar             medium
+
+symbol p      circle_hollow
+symbol p1     circle_hollow
+symbol p2     triangle_hollow
+symbol p3     plus
+symbol p4     diamond_hollow
+symbol p5     diamond
+symbol p6     square_hollow
+symbol p7     square
+symbol p8     x
+symbol p9     triangle_hollow
+symbol p10    triangle
+symbol p11    smcircle
+symbol p12    smdiamond_hollow
+symbol p13    smsquare
+symbol p14    smtriangle_hollow
+symbol p15    smx
+
+symbol matrix                smcircle_hollow
+color matrixmarkline         black
+color mat_label_box          background
+
+color textbox                white
+color bylabel_outline        black
+
+color p 	gs5
+color p1     "33 102 172"  // Bu from RdBu-7, replaces navy
+color p2     "178 24 43"   // Rd from RdBu-7, replaces maroon
+color p3     "77 77 77"   // Gn from PRGn-7, replaces forest_green
+color p4     "230 97 1"    // Or from PuOr-7, replaces dkorange
+color p5     "0 176 0"    // BG from BrBG-7, replaces teal
+color p6     "197 27 125"  // Pi from PiYG-7, replaces cranberry
+color p7     "118 42 131"  // Pu from PuOr-7, replaces lavender (PR from PRGn-7 could also work)
+color p8     "140 81 10"   // Br from BrBG-7, replaces khaki
+color p9     "27 120 55"    // Gy from RdGy-7, replaces sienna intensity bar 50
+
+color ci_line                "33 102 172"  // Bu from RdBu-7
+color ci_arealine            "103 169 207"
+color ci_area                "209 229 240"
+color ci_symbol              gs5
+color ci2_line               "178 24 43"   // Rd from RdBu-7
+color ci2_arealine           "239 138 98"
+color ci2_area               "253 219 199"
+color ci2_symbol             gs5
+
+intensity histogram          50
+linewidth histogram          vthin
+color histogram_line         "33 102 172"  // Bu from RdBu-7
+color histogram              "33 102 172"  // Bu from RdBu-7
+color refline                 black  // Rd from RdBu-7, replaces red
+
+color xyline          "178 24 43"   // Rd from RdBu-7, replaces red
+linepattern xyline                dash
+
+margin heading              bottom
+margin axis_title                      small
+margin plotregion                  zero
+
+anglestyle vertical_tick     horizontal
+linewidth legend_line           thin
+gsize legend_key_xsize       medsmall
+
+clockdir legend_position     6
+clockdir title_position     12
+yesno draw_major_grid        yes
+yesno draw_minor_grid        yes
+
+axisstyle		horizontal_withgrid
+axisstyle	  	vertical_withgrid
