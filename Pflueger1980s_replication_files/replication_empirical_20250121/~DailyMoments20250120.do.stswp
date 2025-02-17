@@ -327,7 +327,7 @@ use "$mainpath\beta_nom_rolling_8.dta", clear
 gen date2=mdy(06,30,2018)
 keep if date>=date2
 
-*Figure 10, Panel A
+*Figure 10, Panel B
 ****************** Updated Figure plot_breakeven_postpandemic_Feb2024 ************************
 graph twoway (line b_rby10 b_rby10_upper b_rby10_lower date if b_ry10 ~= . & year<2024, ///
     lcolor(blue black black green black black) ///
@@ -344,7 +344,7 @@ graph twoway (line b_rby10 b_rby10_upper b_rby10_lower date if b_ry10 ~= . & yea
 graph export "$mainpath\plot_breakeven_postpandemic_Feb2024_Pflueger.pdf", as(pdf) name("Graph") replace
 ***********************************************************************************************
 
-*Figure 10, Panel B
+*Figure 10, Panel A
 ****************** Updated Figure plot_betas_postpandemic_Feb2024 ************************
 graph twoway (line b_ry10 b_rtips10 zero date if b_ry10 ~= . & year<2024, ///
     lcolor(red blue black black black black) ///
