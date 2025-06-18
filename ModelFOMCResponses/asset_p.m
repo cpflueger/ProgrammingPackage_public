@@ -213,6 +213,7 @@ classdef asset_p
             asset.FOMC_run          = asset_pI.FOMC_run;
             asset.risk_neutral_run  = asset_pI.risk_neutral_run;
             asset.simulated_rn      = asset_pI.simulated_rn;
+            asset.initialShockVec   = initialShockVec;
                        
             % Standard deviation of shock that is released at quarter-end
             FOMC_std = (asset_pI.initialShockVec)/400;
