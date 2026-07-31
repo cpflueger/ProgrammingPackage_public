@@ -3,10 +3,14 @@
 % The Drivers of Inflation and Real Risks in Treasury Bonds"                            %% 
 %% cpflueger@uchicago.edu 1/20/2025
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% Change directory to the specified path
-%cd('C:\Users\cpflueger\Documents\GitHub\InflationExpectationsFormation\InflationExpectationsFormation');
-cd('C:\Users\luisyepezsa\OneDrive - The University of Chicago\Documents\GitHub\ProgrammingPackage_public\Pflueger1980s_replication_files');
-%cd('C:\Users\pflue\OneDrive\Documents\GitHub\InflationExpectationsFormation');
+% Change directory to the folder holding this file, so that the relative
+% paths used below (*.mat, ./figures, ./results_sensitivity) resolve
+scriptFile = mfilename('fullpath');
+if isempty(scriptFile) && usejava('desktop')
+    % "Run Section" from the Editor does not set mfilename
+    scriptFile = matlab.desktop.editor.getActiveFilename;
+end
+cd(fileparts(scriptFile));
 
 % Load empirical results data required for analysis
 %load EmpiricalBase.mat;
@@ -162,8 +166,9 @@ macro=macro_base;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         h = figure('Position', get(0, 'Screensize'));
         pause(0.00001);
-        frame_h = get(handle(gcf),'JavaFrame');
-        set(frame_h,'Maximized',1); 
+        if isprop(h,'WindowState')  % WindowState replaced JavaFrame in R2018a
+            set(h,'WindowState','Maximized');
+        end
 macro_alt=macro_demand;
 
 subplot(4,3,1);

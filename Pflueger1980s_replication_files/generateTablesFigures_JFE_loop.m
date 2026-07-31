@@ -4,8 +4,14 @@
 %% Loop for gridsearch changing rho^i, gamma^pi and gamma^x with a MP shock
 clear variables
 
-% Change directory to the specified path
-cd('C:\Users\luisyepezsa\OneDrive - The University of Chicago\Documents\GitHub\ProgrammingPackage_public\Pflueger1980s_replication_files');
+% Change directory to the folder holding this file, so that the relative
+% paths used below (*.mat, ./results_sensitivity) resolve
+scriptFile = mfilename('fullpath');
+if isempty(scriptFile) && usejava('desktop')
+    % "Run Section" from the Editor does not set mfilename
+    scriptFile = matlab.desktop.editor.getActiveFilename;
+end
+cd(fileparts(scriptFile));
 
 % Load baseline calibration
 load Calibrationgridsearch_demand2.mat
@@ -65,8 +71,14 @@ end
 %% Loop for gridsearch changing rho^i, gamma^pi and gamma^x with a Supply shock
 clear variables
 
-% Change directory to the specified path
-cd('C:\Users\luisyepezsa\OneDrive - The University of Chicago\Documents\GitHub\ProgrammingPackage_public\Pflueger1980s_replication_files');
+% Change directory to the folder holding this file, so that the relative
+% paths used below (*.mat, ./results_sensitivity) resolve
+scriptFile = mfilename('fullpath');
+if isempty(scriptFile) && usejava('desktop')
+    % "Run Section" from the Editor does not set mfilename
+    scriptFile = matlab.desktop.editor.getActiveFilename;
+end
+cd(fileparts(scriptFile));
 
 % Load baseline calibration
 load Calibrationgridsearch_demand2.mat
@@ -128,8 +140,14 @@ end
 %% Loop for gridsearch changing rho^i, gamma^pi and gamma^x with a Demand shock
 clear variables
 
-% Change directory to the specified path
-cd('C:\Users\luisyepezsa\OneDrive - The University of Chicago\Documents\GitHub\ProgrammingPackage_public\Pflueger1980s_replication_files');
+% Change directory to the folder holding this file, so that the relative
+% paths used below (*.mat, ./results_sensitivity) resolve
+scriptFile = mfilename('fullpath');
+if isempty(scriptFile) && usejava('desktop')
+    % "Run Section" from the Editor does not set mfilename
+    scriptFile = matlab.desktop.editor.getActiveFilename;
+end
+cd(fileparts(scriptFile));
 
 % Load baseline calibration
 load Calibrationgridsearch_demand2.mat

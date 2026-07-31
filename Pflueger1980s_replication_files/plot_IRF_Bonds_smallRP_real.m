@@ -9,9 +9,9 @@ function plot_IRF_Bonds_smallRP_real(asset1, asset2, figNameFile)
         % Plot figure
         h = figure;
         pause(0.00001);
-%         frame_h = get(handle(gcf),'JavaFrame');
-%         set(frame_h,'Maximized',1);
-        set(gcf,'WindowState','Maximized');
+        if isprop(h,'WindowState')  % WindowState replaced JavaFrame in R2018a
+            set(h,'WindowState','Maximized');
+        end
         set(gcf,'color','w');
         
         x_axis = [0:16];

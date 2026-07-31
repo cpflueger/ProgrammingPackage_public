@@ -4,8 +4,14 @@
 %% Loop for gridsearch with the second period calibration (demand shock) and changing rho^i, gamma_pi and sigma_pi - Figure 8 results
 clear variables
 
-% Change directory to the specified path
-cd('C:\Users\luisyepezsa\OneDrive - The University of Chicago\Documents\GitHub\InflationExpectationsFormation');
+% Change directory to the folder holding this file, so that the relative
+% paths used below (*.mat, ./results_sensitivity) resolve
+scriptFile = mfilename('fullpath');
+if isempty(scriptFile) && usejava('desktop')
+    % "Run Section" from the Editor does not set mfilename
+    scriptFile = matlab.desktop.editor.getActiveFilename;
+end
+cd(fileparts(scriptFile));
 
 % Load demand shock calibration
 load Calibrationgridsearch_demand2.mat
@@ -68,8 +74,14 @@ end
 %% Loop for gridsearch with the second period calibration (demand shock) and changing rho^i, gamma^x and sigma_pi - Figure A6 results
 clear variables
 
-% Change directory to the specified path
-cd('C:\Users\luisyepezsa\OneDrive - The University of Chicago\Documents\GitHub\InflationExpectationsFormation');
+% Change directory to the folder holding this file, so that the relative
+% paths used below (*.mat, ./results_sensitivity) resolve
+scriptFile = mfilename('fullpath');
+if isempty(scriptFile) && usejava('desktop')
+    % "Run Section" from the Editor does not set mfilename
+    scriptFile = matlab.desktop.editor.getActiveFilename;
+end
+cd(fileparts(scriptFile));
 
 % Load demand shock calibration
 load Calibrationgridsearch_demand2.mat

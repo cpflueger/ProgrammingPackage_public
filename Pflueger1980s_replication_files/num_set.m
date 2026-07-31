@@ -201,24 +201,28 @@ classdef num_set
                 splot= num_set.shat + macro_dyn.sbar;
 
                 case {6,7,8}
+                    % splotu is increasing, so splotu(1)=min(splotu). Releases up to
+                    % ~R2022b silently took this first element when a colon operand
+                    % was a vector; later releases error instead, so the lower
+                    % segments below index it explicitly to keep results identical.
                     switch(num_set.sfast)
                         case 6, %This is the case we mostly use
                             %Intermediate size grid of size 50
                             splotu  = log(macro_dyn.Smax/20:macro_dyn.Smax/20:macro_dyn.Smax);
                             %lower segment as in Wachter
-                            splot1  = (-50:(50+splotu)/30:min(splotu)-(50+splotu)/130);
+                            splot1  = (-50:(50+splotu(1))/30:min(splotu)-(50+splotu(1))/130);
                             splot   = horzcat(splot1, splotu); %concatenate arrays horizontally
                         case 7,
                             splotu  = log(macro_dyn.Smax/20:macro_dyn.Smax/20:macro_dyn.Smax);
                             %lower segment as in Wachter
-                            splot1=(-100:(100+splotu)/100:min(splotu)-(100+splotu)/130);
+                            splot1=(-100:(100+splotu(1))/100:min(splotu)-(100+splotu(1))/130);
                             splot  = horzcat(splot1, splotu);
                         case 8,
                             %This is the largest grid, exactly as in Wachter
                             %Upper segment as in Wachter. 
                             splotu  = log(macro_dyn.Smax/101:macro_dyn.Smax/101:macro_dyn.Smax);
                             %lower segment as in Wachter
-                            splot1=(-300:(300+splotu)/900:min(splotu)-(300+splotu)/900);
+                            splot1=(-300:(300+splotu(1))/900:min(splotu)-(300+splotu(1))/900);
                             splot  = horzcat(splot1, splotu);
                     end
             num_set.shat = real(splot-macro_dyn.sbar);
